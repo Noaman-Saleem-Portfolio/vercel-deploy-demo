@@ -1,28 +1,28 @@
-const express = require("express")
-const app = express()
+const express = require("express");
+const app = express();
 const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 const methodOverride = require("method-override");
-const connectDatabase = require("./config/database")
-const Blog = require("./models/Blog")
+const connectDatabase = require("./config/database");
+const Blog = require("./models/Blog");
 
 //connecting to MongoDB
-connectDatabase()
+connectDatabase();
 
-const port = 5000
+const port = process.env.PORT || 5000;
 
 // override with POST having ?_method=DELETE/PATCH
 app.use(methodOverride("_method"));
 
 // // for parsing application/x-www-form-urlencoded
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({ extended: true }));
 
 //setting folder for static assets
-app.use(express.static("public"))
+app.use(express.static("public"));
 // app.use(express.static(path.join(__dirname,"public")))
 
 //setting ejs
-app.set("view engine","ejs")
+app.set("view engine", "ejs");
 // app.set("views","views")
 // app.set("views",path.join(__dirname,"views"))
 
@@ -67,41 +67,40 @@ app.set("view engine","ejs")
 
 // https://images.pexels.com/photos/620335/pexels-photo-620335.jpeg?auto=compress&cs=tinysrgb&w=600
 
-
 //home route --> Render home.ejs
-app.get("/",(req,res)=>{
-    // console.log(uuidv4());
-    res.render("home")
-})
+app.get("/", (req, res) => {
+  // console.log(uuidv4());
+  res.render("home");
+});
 
 //display all blogs
-app.get("/blogs",async (req,res)=>{
-  const blogs = await Blog.find({})
+app.get("/blogs", async (req, res) => {
+  const blogs = await Blog.find({});
   // console.log(blogs);
-    res.render("blogs/index",{blogs})
-})
+  res.render("blogs/index", { blogs });
+});
 
 //form to create new blog
-app.get("/blogs/new",(req,res)=>{
-    res.render("blogs/new")
-})
+app.get("/blogs/new", (req, res) => {
+  res.render("blogs/new");
+});
 
 //create new blog  --> POST
-app.post("/blogs",async (req,res)=>{
-    // console.log(`Data Receieved`);
-    // console.log(req.body);
-    const {title, description, image} = req.body
-    const newBlog = {title, description, image, id: uuidv4()}
-    // blogs.push(newBlog)
-    const blog = new Blog({
-      title, 
-      description, 
-      image
-    })
+app.post("/blogs", async (req, res) => {
+  // console.log(`Data Receieved`);
+  // console.log(req.body);
+  const { title, description, image } = req.body;
+  const newBlog = { title, description, image, id: uuidv4() };
+  // blogs.push(newBlog)
+  const blog = new Blog({
+    title,
+    description,
+    image,
+  });
 
-    await blog.save()
-    res.redirect('/blogs')
-})
+  await blog.save();
+  res.redirect("/blogs");
+});
 
 //create new blog  --> GET
 // app.get("/blogs-create",(req,res)=>{
@@ -109,51 +108,50 @@ app.post("/blogs",async (req,res)=>{
 //     console.log(req.query);
 // })
 
-
 //show deatail of specific blog
-app.get("/blogs/:id", async (req,res) => {
+app.get("/blogs/:id", async (req, res) => {
   // console.log(req.params);
-  const {id} = req.params
+  const { id } = req.params;
   // const foundBlog = blogs.find((blog) =>  blog.id === id)
   // console.log(foundBlog);
 
-  const foundBlog = await Blog.findById(id)
+  const foundBlog = await Blog.findById(id);
 
-  res.render("blogs/show",{foundBlog})
-})
+  res.render("blogs/show", { foundBlog });
+});
 
 //form to edit specific blog
-app.get("/blogs/:id/edit",async (req,res)=>{
-  const {id} = req.params
+app.get("/blogs/:id/edit", async (req, res) => {
+  const { id } = req.params;
   // const foundBlog = blogs.find((blog) =>  blog.id === id)
 
-  const foundBlog = await Blog.findById(id)
+  const foundBlog = await Blog.findById(id);
 
-  res.render("blogs/edit",{foundBlog})
-})
+  res.render("blogs/edit", { foundBlog });
+});
 
 //update spacific blog
-app.patch("/blogs/:id",async (req,res)=>{
+app.patch("/blogs/:id", async (req, res) => {
   // console.log(`Update API Hit!`);
-  const {id} = req.params
-  const {title, description, image} = req.body
+  const { id } = req.params;
+  const { title, description, image } = req.body;
   //Quiz Write the code to update array element by youself
 
-  await Blog.findByIdAndUpdate(id,{title, description, image})
+  await Blog.findByIdAndUpdate(id, { title, description, image });
 
-  res.redirect("/blogs")
-})
+  res.redirect("/blogs");
+});
 
 //delete spacific blog
-app.delete("/blogs/:id",async (req,res)=>{
+app.delete("/blogs/:id", async (req, res) => {
   // console.log(`Update API Hit!`);
-  const {id} = req.params
-  await Blog.findByIdAndDelete(id)
+  const { id } = req.params;
+  await Blog.findByIdAndDelete(id);
 
   //Quiz Write the code todelete the array element by youself
-  res.redirect("/blogs")
-})
+  res.redirect("/blogs");
+});
 
-app.listen(port,() => {
-    console.log(`Server listening at port ${port}`);
-})
+app.listen(port, () => {
+  console.log(`Server listening at port ${port}`);
+});
