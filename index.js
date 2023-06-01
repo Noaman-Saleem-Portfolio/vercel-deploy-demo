@@ -9,7 +9,7 @@ const Blog = require("./models/Blog");
 //connecting to MongoDB
 connectDatabase();
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT;
 
 // override with POST having ?_method=DELETE/PATCH
 app.use(methodOverride("_method"));
